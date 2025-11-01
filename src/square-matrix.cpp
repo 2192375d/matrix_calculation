@@ -31,6 +31,16 @@ Square_Matrix::Square_Matrix(const Matrix &right) {
     v = right.get_data();
 }
 
+Square_Matrix Square_Matrix::get_identity(size_t n) {
+
+    std::vector<std::vector<double>> I;
+    I.assign(n, std::vector<double>(n, 0.0));
+    for (std::size_t i = 0; i < n; ++i) {
+        I[i][i] = 1.0;
+    }
+    return Square_Matrix(I);
+}
+
 /*
  * The method returns the determinant of the matrix
  * using the helper function det.

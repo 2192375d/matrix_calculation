@@ -80,3 +80,27 @@ inline int getLargestDigit(std::vector<std::vector<double>> m) {
 
     return largest;
 }
+
+inline int get_largest_index(std::vector<double> v) {
+
+    int largest_index = 0;
+    for (size_t i = 0; i < v.size(); i++) {
+        if (v[i] > v[largest_index]) {
+            largest_index = i;
+        }
+    }
+
+    return largest_index;
+}
+
+inline double get_largest(std::vector<double> v) {
+
+    double largest = v[0];
+    for (size_t i = 0; i < v.size(); i++) {
+        if (v[i] > largest) {
+            largest = v[i];
+        }
+    }
+
+    return largest;
+}

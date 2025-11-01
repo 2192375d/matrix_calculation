@@ -9,6 +9,8 @@ class Square_Matrix : public Matrix {
     Square_Matrix(std::vector<std::vector<double>> m);
     Square_Matrix(const Matrix &right);
 
+    static Square_Matrix get_identity(size_t n);
+
     double determinant() const;
 
     double cofactor(int row, int col) const;

@@ -1,5 +1,6 @@
 #include "../include/matrix.hpp"
 #include "../include/helpers.hpp"
+#include "../include/square-matrix.hpp"
 
 #include <iostream>
 #include <stdexcept>
@@ -116,6 +117,99 @@ Matrix::Matrix(std::vector<std::vector<double>> v) {
 
 // copy constructor
 Matrix::Matrix(const Matrix &right) { v = right.v; }
+
+std::vector<double> Matrix::get_row(size_t row_num) const {
+    if (row_num >= get_num_row()) {
+        throw std::invalid_argument(
+            "class Matrix: get_row: input row_num larger than the number of "
+            "rows in the matrix");
+    }
+
+    std::vector<double> row;
+    for (size_t j = 0; j < get_num_col(); j++) {
+        row.push_back(v[row_num][j]);
+    }
+
+    return row;
+}
+
+std::vector<double> Matrix::get_col(size_t col_num) const {
+    if (col_num >= get_num_col()) {
+        throw std::invalid_argument(
+            "class Matrix: get_col: input col_num larger than the number of "
+            "columns in the matrix");
+    }
+
+    std::vector<double> col;
+    for (size_t j = 0; j < get_num_row(); j++) {
+        col.push_back(v[j][col_num]);
+    }
+
+    return col;
+}
+
+Matrix Matrix::row_operation_add(size_t source_row, size_t to_add_row,
+                                 double scalar) const {
+    if (source_row >= v.size()) {
+        throw std::invalid_argument("class Matrix: row_operation_add: input "
+                                    "source_row larger than the number of "
+                                    "rows in the matrix");
+    }
+
+    if (to_add_row >= v.size()) {
+        throw std::invalid_argument("class Matrix: row_operation_add: input "
+                                    "to_add_row larger than the number of "
+                                    "rows in the matrix");
+    }
+
+    std::vector<std::vector<double>> m = get_data();
+    for (size_t j = 0; j < get_num_col(); j++) {
+        m[source_row][j] += scalar * m[to_add_row][j];
+    }
+
+    return Matrix(m);
+}
+
+Matrix Matrix::row_operation_multiply(size_t source_row, double scalar) const {
+    if (source_row >= v.size()) {
+        throw std::invalid_argument(
+            "class Matrix: row_operation_multiply: input "
+            "source_row larger than the number of "
+            "rows in the matrix");
+    }
+
+    if (scalar == 0) {
+        throw std ::invalid_argument(
+            "class Matrix: row_operation_multiply: input scalar is zero");
+    }
+
+    std::vector<std::vector<double>> m = get_data();
+    for (size_t j = 0; j < get_num_col(); j++) {
+        m[source_row][j] *= scalar;
+    }
+
+    return Matrix(m);
+}
+
+Matrix Matrix::row_operation_swap(size_t row1, size_t row2) const {
+
+    if (row1 >= v.size()) {
+        throw std::invalid_argument("class Matrix: row_operation_swap: input "
+                                    "row1 larger than the number of "
+                                    "rows in the matrix");
+    }
+
+    if (row2 >= v.size()) {
+        throw std::invalid_argument("class Matrix: row_operation_swap: input "
+                                    "row2 larger than the number of "
+                                    "rows in the matrix");
+    }
+
+    std::vector<std::vector<double>> m = get_data();
+    std::swap(m[row1], m[row2]);
+
+    return Matrix(m);
+}
 
 /*
  * The method will return a matrix which is the
@@ -296,3 +390,12 @@ Matrix Matrix::transpose() {
 
     return m;
 }
+
+// PLU Matrix::LU_factorization() {
+//     Square_Matrix P = Square_Matrix::get_identity(get_num_row());
+//     Square_Matrix L;
+//     Square_Matrix U;
+//
+//     for (size_t i = 0; i < get_num_col(); i++) {
+//     }
+// }
