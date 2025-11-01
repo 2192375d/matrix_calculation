@@ -1,5 +1,4 @@
 #include "../include/square-matrix.hpp"
-// #include <stdexcept>
 #include <stdexcept>
 #include <vector>
 
@@ -39,6 +38,33 @@ Square_Matrix Square_Matrix::get_identity(size_t n) {
         I[i][i] = 1.0;
     }
     return Square_Matrix(I);
+}
+
+// bad time complexity of k * n^2, can be refined to n^2 + k
+Square_Matrix Square_Matrix::get_permutation_matrix(
+    size_t n, std::vector<std::pair<size_t, size_t>> instructions) {
+
+    Square_Matrix m = get_identity(n);
+
+    for (int i = 0; i < instructions.size(); i++) {
+
+        if (instructions[i].first > n || instructions[i].second > n) {
+            throw std::invalid_argument(
+                "class SquareMatrix: get_permutation_matrix: input set of "
+                "instructions have row value larger than n");
+        }
+
+        m = m.row_operation_swap(instructions[i].first, instructions[i].second);
+    }
+
+    return m;
+}
+
+Square_Matrix Square_Matrix::get_permutation_matrix(size_t n, size_t row1,
+                                                    size_t row2) {
+
+    Square_Matrix m = get_identity(n);
+    return get_permutation_matrix(n, {{row1, row2}});
 }
 
 /*

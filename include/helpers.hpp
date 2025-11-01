@@ -19,7 +19,7 @@ inline void pause_console() {
  * Return the number of digit of the given number.
  * The decimal point is considered as a digit as well.
  */
-inline int getNumDigit(double n) {
+inline int get_num_digit(double n) {
 
     int numDigit = 0;
 
@@ -68,7 +68,7 @@ inline int getNumDigit(double n) {
  * of digit of it. Note that the decimal point is
  * considered as a digit as well.
  */
-inline int getLargestDigit(std::vector<std::vector<double>> m) {
+inline int get_largest_digit(std::vector<std::vector<double>> m) {
     int largest = 0;
     for (size_t i = 0; i < m.size(); i++) {
         for (size_t j = 0; j < m[i].size(); j++) {

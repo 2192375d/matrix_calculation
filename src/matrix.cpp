@@ -6,15 +6,12 @@
 #include <stdexcept>
 #include <vector>
 
-int getLargestDigit(std::vector<std::vector<double>> v);
-int getNumDigit(double n);
-
 /*
  * Outputs the matrix, leaves 2 spaces between each
  * value in the same row.
  */
 std::ostream &operator<<(std::ostream &out, const Matrix &m) {
-    int largestNumDigit = getLargestDigit(m.v);
+    int largestNumDigit = get_largest_digit(m.v);
 
     // Loop through each index
     for (size_t i = 0; i < m.v.size(); i++) {
@@ -29,7 +26,8 @@ std::ostream &operator<<(std::ostream &out, const Matrix &m) {
             out << "  ";
 
             // Leave space based on the largest digit in the matrix
-            for (int k = 0; k < largestNumDigit - getNumDigit(m.v[i][j]); k++) {
+            for (int k = 0; k < largestNumDigit - get_num_digit(m.v[i][j]);
+                 k++) {
                 out << " ";
             }
         }
@@ -391,11 +389,16 @@ Matrix Matrix::transpose() {
     return m;
 }
 
-// PLU Matrix::LU_factorization() {
-//     Square_Matrix P = Square_Matrix::get_identity(get_num_row());
-//     Square_Matrix L;
-//     Square_Matrix U;
-//
-//     for (size_t i = 0; i < get_num_col(); i++) {
-//     }
-// }
+PLU Matrix::LU_factorization() {
+    Square_Matrix P = Square_Matrix::get_identity(get_num_row());
+    Square_Matrix L;
+    Square_Matrix U;
+
+    int pivot_index = 0;
+
+    for (size_t i = 0; i < get_num_col(); i++) {
+        pivot_index = get_largest(get_col(i));
+        if (pivot_index != i) {
+        }
+    }
+}
