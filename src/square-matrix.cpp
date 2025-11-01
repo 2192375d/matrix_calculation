@@ -1,15 +1,41 @@
-#include "../include/SquareMatrix.hpp"
+#include "../include/square-matrix.hpp"
+// #include <stdexcept>
 #include <stdexcept>
 #include <vector>
 
-double getDeterminant(std::vector<std::vector<double>> matrix);
-int getRank(SquareMatrix m);
+double get_determinant(std::vector<std::vector<double>> matrix);
+int get_rank(Square_Matrix m);
+
+// A no-arg constructor
+Square_Matrix::Square_Matrix() {}
+
+Square_Matrix::Square_Matrix(std::vector<std::vector<double>> v) {
+    if (!v.empty() and v.size() != v[0].size()) {
+        throw std::invalid_argument(
+            "class SquareMatrix: constructor: input matrix is not square");
+    }
+
+    this->v = v;
+}
+
+/*
+ * A copy constructor to copy from it's base class Matrix.
+ */
+Square_Matrix::Square_Matrix(const Matrix &right) {
+    if (right.get_num_col() != right.get_num_row()) {
+        throw std::invalid_argument(
+            "class SquareMatrix: copy constructor: input matrix cannot be "
+            "converted to a square matrix");
+    }
+
+    v = right.get_data();
+}
 
 /*
  * The method returns the determinant of the matrix
  * using the helper function det.
  */
-double SquareMatrix::determinant() const { return getDeterminant(v); }
+double Square_Matrix::determinant() const { return get_determinant(v); }
 
 /*
  * A recursion function which provides the determinant
@@ -17,7 +43,7 @@ double SquareMatrix::determinant() const { return getDeterminant(v); }
  * is assumed to be square, an error will occur if it's
  * not the case.
  */
-double getDeterminant(std::vector<std::vector<double>> matrix) {
+double get_determinant(std::vector<std::vector<double>> matrix) {
 
     if (matrix.size() == 1) {
         return matrix[0][0];
@@ -36,8 +62,8 @@ double getDeterminant(std::vector<std::vector<double>> matrix) {
                 v[j].erase(v[j].begin() + i);
             }
 
-            first == true ? sum += matrix[0][i] * getDeterminant(v)
-                          : sum -= matrix[0][i] * getDeterminant(v);
+            first == true ? sum += matrix[0][i] * get_determinant(v)
+                          : sum -= matrix[0][i] * get_determinant(v);
 
             first = !first;
         }
@@ -45,15 +71,6 @@ double getDeterminant(std::vector<std::vector<double>> matrix) {
         return sum;
     }
 }
-
-// A no-arg constructor
-SquareMatrix::SquareMatrix() {}
-
-/*
- * A copy constructor to copy from it's base class
- * Matrix.
- */
-SquareMatrix::SquareMatrix(const Matrix &right) { v = right.v; }
 
 /*
  * Returns the cofactor at the indicated row and column.
@@ -63,14 +80,14 @@ SquareMatrix::SquareMatrix(const Matrix &right) { v = right.v; }
  * a message indicating the case and return a 1 by 1
  * matrix with NULL as it's only index.
  */
-double SquareMatrix::cofactor(int row, int col) const {
+double Square_Matrix::cofactor(int row, int col) const {
 
     if (row < 1 or row > v.size() or col < 1 or col > v[0].size()) {
         throw std::invalid_argument("class SquareMatrix: function cofactor: "
                                     "input row or argument is out of bound");
     }
 
-    SquareMatrix m = minor(row, col);
+    Square_Matrix m = minor(row, col);
     return (row + col) % 2 == 0 ? m.determinant() : -m.determinant();
 }
 
@@ -79,21 +96,16 @@ double SquareMatrix::cofactor(int row, int col) const {
  * minor of the original matrix based on the row
  * and column in the parameter list.
  *
- * If the row/column is less than 1 or larger than
- * the size of the matrix, the method will display
- * a message indicating the case and return a 1 by 1
- * matrix with NULL as it's only index.
  */
-SquareMatrix SquareMatrix::minor(int row, int col) const {
-
-    Matrix m;
-    m.v = v;
-
+Square_Matrix Square_Matrix::minor(size_t row, size_t col) const {
     // Check if the row/column is in the range
     if (row < 1 or row > v.size() or col < 1 or col > v.size()) {
         throw std::invalid_argument("class SquareMatrix: function minor: "
                                     "input row or argument is out of bound");
     }
+
+    Square_Matrix m;
+    m = *this;
 
     // Erase the row
     m.v.erase(m.v.begin() + row - 1);
@@ -110,8 +122,8 @@ SquareMatrix SquareMatrix::minor(int row, int col) const {
  * The method returns the adjoint of the given
  * matrix
  */
-SquareMatrix SquareMatrix::adjoint() const {
-    SquareMatrix m;
+Square_Matrix Square_Matrix::adjoint() const {
+    Square_Matrix m;
 
     for (size_t i = 0; i < v.size(); i++) {
 
@@ -135,8 +147,8 @@ SquareMatrix SquareMatrix::adjoint() const {
  * exists and returns a matrix with a single value
  * NULL.
  */
-SquareMatrix SquareMatrix::inverse() const {
-    SquareMatrix m;
+Square_Matrix Square_Matrix::inverse() const {
+    Square_Matrix m;
 
     if (determinant() == 0) {
         throw std::runtime_error("class SquareMatrix: function inverse: "
@@ -155,38 +167,35 @@ SquareMatrix SquareMatrix::inverse() const {
 
 /*
  */
-int SquareMatrix::rank() { return getRank(*this); }
+int Square_Matrix::rank() { return get_rank(*this); }
 
 /*
  * This is a recursion function which takes the input
  * SquareMatrix object and return the rank of it.
  * Note that non square matrices will return error.
  */
-int getRank(SquareMatrix m) {
+int get_rank(Square_Matrix m) {
 
-    if (m.v.size() == 0) {
+    if (m.get_num_row() == 0) {
         return 0;
     }
 
-    else if (m.determinant() != 0) {
-        return m.v.size();
+    if (m.determinant() != 0) {
+        return m.get_num_row();
     }
 
-    else {
+    int largest = get_rank(m.minor(1, 1));
 
-        int largest = getRank(m.minor(1, 1));
+    for (int i = 0; i < m.get_num_row(); i++) {
+        for (int j = 0; j < m.get_num_col(); j++) {
 
-        for (int i = 0; i < m.v.size(); i++) {
-            for (int j = 0; j < m.v[0].size(); j++) {
+            int currentRank = get_rank(m.minor(i + 1, j + 1));
 
-                int currentRank = getRank(m.minor(i + 1, j + 1));
-
-                if (currentRank > largest) {
-                    largest = currentRank;
-                }
+            if (currentRank > largest) {
+                largest = currentRank;
             }
         }
-
-        return largest;
     }
+
+    return largest;
 }

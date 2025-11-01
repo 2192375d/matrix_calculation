@@ -1,9 +1,8 @@
-#include "../include/Matrix.hpp"
+#include "../include/matrix.hpp"
 #include "../include/helpers.hpp"
 
 #include <iostream>
 #include <stdexcept>
-#include <string>
 #include <vector>
 
 int getLargestDigit(std::vector<std::vector<double>> v);
@@ -47,77 +46,73 @@ std::ostream &operator<<(std::ostream &out, const Matrix &m) {
  * ones will be printed with a zero(0)
  */
 std::istream &operator>>(std::istream &in, Matrix &m) {
-    size_t numRow;
-    size_t numCol;
+    m.v.clear();
 
-    // Get number of row
-    do {
-
-        // std::system("clear");
-
-        std::cout << "Enter number of row: ";
-        std::cin >> numRow;
-        if (numRow < 0) {
-            std::cout << "Invalid input!" << std::endl;
-            pause_console();
-        }
-    } while (numRow < 0);
-
-    // Get number of column
-    do {
-
-        // std::system("clear");
-
-        std::cout << "Enter number of column: ";
-        std::cin >> numCol;
-        if (numCol < 0) {
-            std::cout << "Invalid input!" << std::endl;
-            pause_console();
-        }
-    } while (numCol < 0);
-
-    // Create an empty vector
-    for (size_t i = 0; i < numRow; i++) {
-        std::vector<double> row;
-
-        for (size_t j = 0; j < numCol; j++) {
-            row.push_back(0);
-        }
-
-        m.v.push_back(row);
+    // Read dimensions
+    std::size_t rows = 0, cols = 0;
+    if (&in == &std::cin) {
+        std::cout << "rows cols: ";
+    }
+    if (!(in >> rows >> cols)) {
+        return in;
     }
 
-    // Get each value
-    for (size_t i = 0; i < numRow; i++) {
-        for (size_t j = 0; j < numCol; j++) {
+    m.v.assign(rows, std::vector<double>(cols));
 
-            // std::system("clear");
-
-            // Print the matrix
-            std::cout << m << std::endl;
-
-            // Get the value
-            std::cout << "Enter the value at " << i + 1 << ", " << j + 1
-                      << ": ";
-            in >> m.v[i][j];
+    // Read entries row by row
+    for (size_t r = 0; r < rows; ++r) {
+        for (size_t c = 0; c < cols; ++c) {
+            if (&in == &std::cin) {
+                std::cout << "A[" << r + 1 << "," << c + 1 << "]: ";
+            }
+            if (!(in >> m.v[r][c])) {
+                return in;
+            }
         }
     }
 
-    // std::system("clear");
-
-    // std::cout << "Here is yoru matrix!" << std::endl;
-    std::cout << m << std::endl;
-
-    pause_console();
+    if (&in == &std::cin) {
+        std::cout << '\n' << m << '\n';
+    }
 
     return in;
 }
+
+size_t Matrix::get_num_row() const {
+    if (v.empty()) {
+        return 0;
+    }
+
+    return v.size();
+}
+
+size_t Matrix::get_num_col() const {
+    if (v.empty()) {
+        return 0;
+    }
+
+    return v[0].size();
+}
+
+std::vector<std::vector<double>> Matrix::get_data() const { return v; }
 
 // default constructor
 Matrix::Matrix() { v.resize(0); }
 
 // constructor
-Matrix::Matrix(std::vector<std::vector<double>> v) { this->v = v; }
+Matrix::Matrix(std::vector<std::vector<double>> v) {
+    if (!v.empty()) {
+        int expected_size = v[0].size();
+        for (size_t i = 0; i < v.size(); i++) {
+            if (v[i].size() == 0 or v[i].size() != expected_size) {
+                throw std::invalid_argument("class Matrix: constructor: input "
+                                            "matrix is not an n by m vector");
+            }
+        }
+    }
+
+    this->v = v;
+}
 
 // copy constructor
 Matrix::Matrix(const Matrix &right) { v = right.v; }
@@ -264,36 +259,6 @@ bool Matrix::operator==(const Matrix &right) const {
     return false;
 }
 
-/*
- * The method returns the matrix from the scalar
- * multiplication where the scalar value is on the
- * right.
- *
- * Note that this method is removed because it's
- * not a good practice to have stuffs like M * 4
- * Should just be 4 * M instead
- */
-// Matrix Matrix::operator*(const double &right) {
-//     Matrix m;
-//
-//     for (int i = 0; i < v.size(); i++) {
-//         std::vector<double> row;
-//
-//         for (int j = 0; j < v[0].size(); j++) {
-//             row.push_back(right * v[i][j]);
-//         }
-//
-//         m.v.push_back(row);
-//     }
-//
-//     return m;
-// }
-
-/*
- * The method returns the matrix from the scalar
- * multiplication where the scalar value is on the
- * left.
- */
 Matrix operator*(const double &left, const Matrix &right) {
     Matrix m;
 
@@ -330,70 +295,4 @@ Matrix Matrix::transpose() {
     }
 
     return m;
-}
-
-/*
- * Use linear search to loop through each number
- * in the given matrix, find the one with the
- * largest number of digit and returns the number
- * of digit of it. Note that the decimal point is
- * considered as a digit as well.
- */
-int getLargestDigit(std::vector<std::vector<double>> m) {
-    int largest = 0;
-    for (size_t i = 0; i < m.size(); i++) {
-        for (size_t j = 0; j < m[i].size(); j++) {
-            if (largest < getNumDigit(m[i][j])) {
-                largest = getNumDigit(m[i][j]);
-            }
-        }
-    }
-
-    return largest;
-}
-
-/*
- * Return the number of digit of the given number.
- * The decimal point is considered as a digit as well.
- */
-int getNumDigit(double n) {
-
-    int numDigit = 0;
-
-    if (n < 0) {
-        numDigit++;
-    }
-
-    n = std::abs(n);
-
-    // Special case n = 0 or n is null (printed as "?"), the number of digit is
-    // 1
-    if (n == 0) {
-        return 1;
-    }
-
-    // When the number is an integer
-    else if (n == int(n)) {
-
-        int x = n;
-
-        while (x != 0) {
-            x /= 10;
-            numDigit++;
-        }
-    }
-
-    // When the number is a decimal
-    else {
-        std::string s = std::to_string(n);
-
-        for (int i = s.size() - 1; s[i] == '0'; i--) {
-            s.pop_back();
-        }
-
-        numDigit += s.size();
-    }
-
-    // Return it!
-    return numDigit;
 }

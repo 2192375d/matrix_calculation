@@ -1,37 +1,29 @@
+#include "../include/matrix.hpp"
+#include "../include/square-matrix.hpp"
 #include <iostream>
 #include <vector>
-#include "Matrix.h"
-#include "SquareMatrix.h"
-using namespace std;
-
-//int menu();
-
 
 int main() {
-	SquareMatrix A1;
-	A1.v =
-	{
-		{4, -6, 0, 0},
-		{-6, 0, 1, 0},
-		{0, 9, -1, 0},
-		{0, 1, 4, 0}
-	};
+    Matrix a{{{1, 2, 3}, {4, 5, 6}}};
+    Matrix b{{{-1, 0, 1}, {2, 3, 4}}};
+    Square_Matrix s{{{4, -6, 0}, {-6, 0, 1}, {0, 9, -1}}};
 
-	Matrix A2;
-	A2.v =
-	{
-		{-1, 5},
-		{1, 2},
-		{-2, 3}
-	};
+    std::cout << "A:\n" << a;
+    std::cout << "B:\n" << b;
+    std::cout << "S:\n" << s;
 
-	Matrix A3;
+    std::cout << "A + B:\n" << (a + b);
+    std::cout << "A - B:\n" << (a - b);
+    std::cout << "A * B^T:\n" << (a * b.transpose());
 
-	A3.v =
-	{
-		{1},
-		{2}
-	};
+    std::cout << "det(S): " << s.determinant() << '\n';
+    std::cout << "rank(S): " << s.rank() << '\n';
 
-	cout << A1.rank();
+    try {
+        std::cout << "S inverse:\n" << s.inverse();
+    } catch (const std::exception &ex) {
+        std::cout << "Inverse failed: " << ex.what() << '\n';
+    }
+
+    return 0;
 }
