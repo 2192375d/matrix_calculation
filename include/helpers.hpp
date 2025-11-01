@@ -72,8 +72,8 @@ inline int get_largest_digit(std::vector<std::vector<double>> m) {
     int largest = 0;
     for (size_t i = 0; i < m.size(); i++) {
         for (size_t j = 0; j < m[i].size(); j++) {
-            if (largest < getNumDigit(m[i][j])) {
-                largest = getNumDigit(m[i][j]);
+            if (largest < get_num_digit(m[i][j])) {
+                largest = get_num_digit(m[i][j]);
             }
         }
     }
