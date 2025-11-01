@@ -3,6 +3,7 @@
 #include <cmath>
 #include <iostream>
 #include <limits>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -68,8 +69,8 @@ inline int get_num_digit(double n) {
  * of digit of it. Note that the decimal point is
  * considered as a digit as well.
  */
-inline int get_largest_digit(std::vector<std::vector<double>> m) {
-    int largest = 0;
+inline double get_largest_digit(std::vector<std::vector<double>> m) {
+    double largest = 0;
     for (size_t i = 0; i < m.size(); i++) {
         for (size_t j = 0; j < m[i].size(); j++) {
             if (largest < get_num_digit(m[i][j])) {
@@ -81,7 +82,7 @@ inline int get_largest_digit(std::vector<std::vector<double>> m) {
     return largest;
 }
 
-inline int get_largest_index(std::vector<double> v) {
+inline size_t get_largest_index(std::vector<double> v) {
 
     int largest_index = 0;
     for (size_t i = 0; i < v.size(); i++) {
@@ -93,14 +94,27 @@ inline int get_largest_index(std::vector<double> v) {
     return largest_index;
 }
 
-inline double get_largest(std::vector<double> v) {
+inline size_t get_largest_index(const std::vector<double> &v, size_t start) {
+    if (start >= v.size()) {
+        throw std::invalid_argument(
+            "helpers.hpp: get_largest_index: input start value is too large");
+    }
 
-    double largest = v[0];
-    for (size_t i = 0; i < v.size(); i++) {
-        if (v[i] > largest) {
-            largest = v[i];
+    size_t largest_index = start;
+    for (size_t i = start + 1; i < v.size(); ++i) {
+        if (v[i] > v[largest_index]) {
+            largest_index = i;
         }
     }
 
-    return largest;
+    return largest_index;
+}
+
+inline std::vector<double> get_abs(std::vector<double> v) {
+    std::vector<double> result;
+    for (size_t i = 0; i < v.size(); i++) {
+        result.push_back(std::abs(v[i]));
+    }
+
+    return result;
 }

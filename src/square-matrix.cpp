@@ -32,12 +32,7 @@ Square_Matrix::Square_Matrix(const Matrix &right) {
 
 Square_Matrix Square_Matrix::get_identity(size_t n) {
 
-    std::vector<std::vector<double>> I;
-    I.assign(n, std::vector<double>(n, 0.0));
-    for (std::size_t i = 0; i < n; ++i) {
-        I[i][i] = 1.0;
-    }
-    return Square_Matrix(I);
+    return Square_Matrix(Matrix::get_identity(n, n));
 }
 
 // bad time complexity of k * n^2, can be refined to n^2 + k
@@ -54,7 +49,7 @@ Square_Matrix Square_Matrix::get_permutation_matrix(
                 "instructions have row value larger than n");
         }
 
-        m = m.row_operation_swap(instructions[i].first, instructions[i].second);
+        m.row_operation_swap(instructions[i].first, instructions[i].second);
     }
 
     return m;

@@ -2,6 +2,7 @@
 #include "../include/helpers.hpp"
 #include "../include/square-matrix.hpp"
 
+#include <algorithm>
 #include <iostream>
 #include <stdexcept>
 #include <vector>
@@ -77,24 +78,6 @@ std::istream &operator>>(std::istream &in, Matrix &m) {
     return in;
 }
 
-size_t Matrix::get_num_row() const {
-    if (v.empty()) {
-        return 0;
-    }
-
-    return v.size();
-}
-
-size_t Matrix::get_num_col() const {
-    if (v.empty()) {
-        return 0;
-    }
-
-    return v[0].size();
-}
-
-std::vector<std::vector<double>> Matrix::get_data() const { return v; }
-
 // default constructor
 Matrix::Matrix() { v.resize(0); }
 
@@ -115,6 +98,42 @@ Matrix::Matrix(std::vector<std::vector<double>> v) {
 
 // copy constructor
 Matrix::Matrix(const Matrix &right) { v = right.v; }
+
+Matrix Matrix::get_zero_matrix(size_t num_row, size_t num_col) {
+
+    std::vector<std::vector<double>> v(num_row,
+                                       std::vector<double>(num_col, 0.0));
+
+    return Matrix(v);
+}
+
+Matrix Matrix::get_identity(size_t num_row, size_t num_col) {
+    std::vector<std::vector<double>> I;
+    I.assign(num_row, std::vector<double>(num_col, 0.0));
+    const size_t N = std::min(num_row, num_col);
+    for (std::size_t i = 0; i < N; i++) {
+        I[i][i] = 1.0;
+    }
+    return Matrix(I);
+}
+
+size_t Matrix::get_num_row() const {
+    if (v.empty()) {
+        return 0;
+    }
+
+    return v.size();
+}
+
+size_t Matrix::get_num_col() const {
+    if (v.empty()) {
+        return 0;
+    }
+
+    return v[0].size();
+}
+
+std::vector<std::vector<double>> Matrix::get_data() const { return v; }
 
 std::vector<double> Matrix::get_row(size_t row_num) const {
     if (row_num >= get_num_row()) {
@@ -146,8 +165,59 @@ std::vector<double> Matrix::get_col(size_t col_num) const {
     return col;
 }
 
-Matrix Matrix::row_operation_add(size_t source_row, size_t to_add_row,
-                                 double scalar) const {
+void Matrix::set_row(size_t row_num, const std::vector<double> &row) {
+
+    if (row_num >= get_num_row()) {
+        throw std::invalid_argument(
+            "class Matrix: set_row: input row_num larger than the number of "
+            "rows in the matrix");
+    }
+
+    if (row.size() != get_num_col()) {
+        throw std::invalid_argument(
+            "class Matrix: set_row: input row's size does not match");
+    }
+
+    v[row_num] = row;
+}
+
+void Matrix::set_col(size_t col_num, const std::vector<double> &col) {
+
+    if (col_num >= get_num_col()) {
+        throw std::invalid_argument(
+            "class Matrix: set_col: input row_num larger than the number of "
+            "columns in the matrix");
+    }
+
+    if (col.size() != get_num_row()) {
+        throw std::invalid_argument(
+            "class Matrix: set_col: input column's size does not match");
+    }
+
+    for (size_t i = 0; i < get_num_row(); i++) {
+        v[i][col_num] = col[i];
+    }
+}
+
+void Matrix::set_entry(size_t i, size_t j, double val) {
+
+    if (i >= get_num_row()) {
+        throw std::invalid_argument(
+            "class Matrix: set_entry: input i larger than the number of "
+            "rows in the matrix");
+    }
+
+    if (j >= get_num_col()) {
+        throw std::invalid_argument(
+            "class Matrix: set_entry: input j larger than the number of "
+            "columns in the matrix");
+    }
+
+    v[i][j] = val;
+}
+
+void Matrix::row_operation_add(size_t source_row, size_t to_add_row,
+                               double scalar) {
     if (source_row >= get_num_row()) {
         throw std::invalid_argument("class Matrix: row_operation_add: input "
                                     "source_row larger than the number of "
@@ -160,15 +230,12 @@ Matrix Matrix::row_operation_add(size_t source_row, size_t to_add_row,
                                     "rows in the matrix");
     }
 
-    std::vector<std::vector<double>> m = get_data();
     for (size_t j = 0; j < get_num_col(); j++) {
-        m[source_row][j] += scalar * m[to_add_row][j];
+        v[source_row][j] += scalar * v[to_add_row][j];
     }
-
-    return Matrix(m);
 }
 
-Matrix Matrix::row_operation_multiply(size_t source_row, double scalar) const {
+void Matrix::row_operation_multiply(size_t source_row, double scalar) {
     if (source_row >= get_num_row()) {
         throw std::invalid_argument(
             "class Matrix: row_operation_multiply: input "
@@ -181,15 +248,12 @@ Matrix Matrix::row_operation_multiply(size_t source_row, double scalar) const {
             "class Matrix: row_operation_multiply: input scalar is zero");
     }
 
-    std::vector<std::vector<double>> m = get_data();
     for (size_t j = 0; j < get_num_col(); j++) {
-        m[source_row][j] *= scalar;
+        v[source_row][j] *= scalar;
     }
-
-    return Matrix(m);
 }
 
-Matrix Matrix::row_operation_swap(size_t row1, size_t row2) const {
+void Matrix::row_operation_swap(size_t row1, size_t row2) {
 
     if (row1 >= v.size()) {
         throw std::invalid_argument("class Matrix: row_operation_swap: input "
@@ -203,10 +267,7 @@ Matrix Matrix::row_operation_swap(size_t row1, size_t row2) const {
                                     "rows in the matrix");
     }
 
-    std::vector<std::vector<double>> m = get_data();
-    std::swap(m[row1], m[row2]);
-
-    return Matrix(m);
+    std::swap(v[row1], v[row2]);
 }
 
 /*
@@ -389,16 +450,33 @@ Matrix Matrix::transpose() {
     return m;
 }
 
-PLU Matrix::LU_factorization() {
-    Square_Matrix P = Square_Matrix::get_identity(get_num_row());
-    Square_Matrix L;
-    Square_Matrix U;
+std::tuple<Matrix, Matrix, Matrix> Matrix::LU_factorization() {
+    const int N = get_num_row();
+    const int M = get_num_col();
+    Square_Matrix P = Square_Matrix::get_identity(N);
+    Matrix L = get_identity(N, std::min(N, M));
+    Matrix U = get_data();
 
-    int pivot_index = 0;
+    for (size_t j = 0; j < std::min(N, M); j++) {
+        size_t pivot_index = get_largest_index(get_abs(get_col(j)), j);
 
-    for (size_t i = 0; i < get_num_col(); i++) {
-        pivot_index = get_largest(get_col(i));
-        if (pivot_index != i) {
+        if (pivot_index != j) {
+            P.row_operation_swap(pivot_index, j);
+            U.row_operation_swap(pivot_index, j);
+        }
+
+        if (U.get_data()[j][j] == 0) {
+            continue;
+        }
+
+        for (size_t i = j + 1; i < N; i++) {
+            double multiplier = U.get_data()[i][j] / U.get_data()[j][j];
+            L.set_entry(i, j, multiplier);
+
+            U.row_operation_add(i, j, -multiplier);
         }
     }
+
+    std::tuple<Matrix, Matrix, Matrix> plu = std::make_tuple(P, L, U);
+    return plu;
 }
