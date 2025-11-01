@@ -150,13 +150,13 @@ std::vector<double> Matrix::get_col(size_t col_num) const {
 
 Matrix Matrix::row_operation_add(size_t source_row, size_t to_add_row,
                                  double scalar) const {
-    if (source_row >= v.size()) {
+    if (source_row >= get_num_row()) {
         throw std::invalid_argument("class Matrix: row_operation_add: input "
                                     "source_row larger than the number of "
                                     "rows in the matrix");
     }
 
-    if (to_add_row >= v.size()) {
+    if (to_add_row >= get_num_row()) {
         throw std::invalid_argument("class Matrix: row_operation_add: input "
                                     "to_add_row larger than the number of "
                                     "rows in the matrix");
@@ -171,7 +171,7 @@ Matrix Matrix::row_operation_add(size_t source_row, size_t to_add_row,
 }
 
 Matrix Matrix::row_operation_multiply(size_t source_row, double scalar) const {
-    if (source_row >= v.size()) {
+    if (source_row >= get_num_row()) {
         throw std::invalid_argument(
             "class Matrix: row_operation_multiply: input "
             "source_row larger than the number of "
