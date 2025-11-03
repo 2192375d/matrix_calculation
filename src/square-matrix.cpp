@@ -1,33 +1,32 @@
 #include "../include/square-matrix.hpp"
+#include "../include/triangular-matrix.hpp"
 #include <stdexcept>
+#include <tuple>
 #include <vector>
 
-double get_determinant(std::vector<std::vector<double>> matrix);
+double
+get_determinant_cofactor_expansion(std::vector<std::vector<double>> matrix);
 int get_rank(Square_Matrix m);
 
 // A no-arg constructor
-Square_Matrix::Square_Matrix() {}
+Square_Matrix::Square_Matrix() : Matrix() {}
 
-Square_Matrix::Square_Matrix(std::vector<std::vector<double>> v) {
+Square_Matrix::Square_Matrix(std::vector<std::vector<double>> v) : Matrix(v) {
     if (!v.empty() and v.size() != v[0].size()) {
         throw std::invalid_argument(
             "class SquareMatrix: constructor: input matrix is not square");
     }
-
-    this->v = v;
 }
 
 /*
  * A copy constructor to copy from it's base class Matrix.
  */
-Square_Matrix::Square_Matrix(const Matrix &right) {
+Square_Matrix::Square_Matrix(const Matrix &right) : Matrix(right) {
     if (right.get_num_col() != right.get_num_row()) {
         throw std::invalid_argument(
             "class SquareMatrix: copy constructor: input matrix cannot be "
             "converted to a square matrix");
     }
-
-    v = right.get_data();
 }
 
 Square_Matrix Square_Matrix::get_identity(size_t n) {
@@ -66,7 +65,19 @@ Square_Matrix Square_Matrix::get_permutation_matrix(size_t n, size_t row1,
  * The method returns the determinant of the matrix
  * using the helper function det.
  */
-double Square_Matrix::determinant() const { return get_determinant(v); }
+double Square_Matrix::determinant() const {
+    return determinant_cofactor_expansion();
+}
+
+/*
+ * The method computes determinant of a matrix using cofactor expansion
+ * (recursive way)
+ * It is strongly recommended not to get determinant through
+ * this one due to it's time complexity of O(n!)
+ */
+double Square_Matrix::determinant_cofactor_expansion() const {
+    return get_determinant_cofactor_expansion(v);
+}
 
 /*
  * A recursion function which provides the determinant
@@ -74,7 +85,8 @@ double Square_Matrix::determinant() const { return get_determinant(v); }
  * is assumed to be square, an error will occur if it's
  * not the case.
  */
-double get_determinant(std::vector<std::vector<double>> matrix) {
+double
+get_determinant_cofactor_expansion(std::vector<std::vector<double>> matrix) {
 
     if (matrix.size() == 1) {
         return matrix[0][0];
@@ -84,7 +96,10 @@ double get_determinant(std::vector<std::vector<double>> matrix) {
         bool first = true;
         double sum = 0;
 
-        for (int i = 0; i < matrix.size(); i++) {
+        for (int i = 0; i < matrix.size(); i++, first = !first) {
+            if (std::abs(matrix[0][i]) == 0.0) {
+                continue;
+            }
 
             std::vector<std::vector<double>> v = matrix;
             v.erase(v.begin());
@@ -93,14 +108,35 @@ double get_determinant(std::vector<std::vector<double>> matrix) {
                 v[j].erase(v[j].begin() + i);
             }
 
-            first == true ? sum += matrix[0][i] * get_determinant(v)
-                          : sum -= matrix[0][i] * get_determinant(v);
-
-            first = !first;
+            first == true
+                ? sum += matrix[0][i] * get_determinant_cofactor_expansion(v)
+                : sum -= matrix[0][i] * get_determinant_cofactor_expansion(v);
         }
 
         return sum;
     }
+}
+
+/*
+ * This method computes the determinant of current square matrix using LU
+ * factorization, with time complexity of O(n^3) (much better than cofactor
+ * expansion)
+ */
+double Square_Matrix::determinant_LU() const {
+    std::tuple<Matrix, Matrix, Matrix> plu = LU_factorization();
+
+    Square_Matrix p = std::get<0>(plu);
+    Triangular_Matrix L = std::get<1>(plu);
+    Triangular_Matrix U = std::get<2>(plu);
+
+    double p_det = p.determinant_cofactor_expansion();
+    if (p_det == 0) {
+        throw std::runtime_error(
+            "class Square_Matrix: method determinant_LU: input permutation "
+            "matrix is not a valid permutation matrix");
+    }
+
+    return L.determinant() * U.determinant() / p_det;
 }
 
 /*

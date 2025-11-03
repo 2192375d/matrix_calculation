@@ -118,3 +118,5 @@ inline std::vector<double> get_abs(std::vector<double> v) {
 
     return result;
 }
+
+inline double max(double a, double b) { return a >= b ? a : b; }

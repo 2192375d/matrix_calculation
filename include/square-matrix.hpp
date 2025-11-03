@@ -17,7 +17,9 @@ class Square_Matrix : public Matrix {
     get_permutation_matrix(size_t n,
                            std::vector<std::pair<size_t, size_t>> instructions);
 
-    double determinant() const;
+    virtual double determinant() const;
+    double determinant_cofactor_expansion() const;
+    double determinant_LU() const;
 
     double cofactor(int row, int col) const;
 

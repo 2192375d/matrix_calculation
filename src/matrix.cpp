@@ -450,7 +450,7 @@ Matrix Matrix::transpose() {
     return m;
 }
 
-std::tuple<Matrix, Matrix, Matrix> Matrix::LU_factorization() {
+std::tuple<Matrix, Matrix, Matrix> Matrix::LU_factorization() const {
     const int N = get_num_row();
     const int M = get_num_col();
     Square_Matrix P = Square_Matrix::get_identity(N);

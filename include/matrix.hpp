@@ -48,7 +48,7 @@ class Matrix {
     // Other methods
     Matrix transpose();
 
-    std::tuple<Matrix, Matrix, Matrix> LU_factorization();
+    std::tuple<Matrix, Matrix, Matrix> LU_factorization() const;
 };
 
 struct PLU {
