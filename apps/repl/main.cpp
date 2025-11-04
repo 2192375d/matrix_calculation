@@ -1,7 +1,7 @@
-#include "../include/helpers.hpp"
-#include "../include/matrix.hpp"
-#include "../include/square-matrix.hpp"
-#include "../include/triangular-matrix.hpp"
+#include "../../include/helpers.hpp"
+#include "../../include/matrix.hpp"
+#include "../../include/square-matrix.hpp"
+#include "../../include/triangular-matrix.hpp"
 
 #include <cmath>
 #include <exception>
