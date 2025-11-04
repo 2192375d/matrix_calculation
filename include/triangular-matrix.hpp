@@ -1,6 +1,7 @@
 #pragma once
 
 #include "./square-matrix.hpp"
+#include "./vector.hpp"
 #include <vector>
 
 class Triangular_Matrix : public Square_Matrix {
@@ -12,4 +13,7 @@ class Triangular_Matrix : public Square_Matrix {
     bool is_upper_triangular();
 
     double determinant() const;
+
+    Vector forward_substitution(Vector b) const;
+    Vector backward_substitution(Vector b) const;
 };

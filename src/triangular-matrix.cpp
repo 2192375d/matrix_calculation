@@ -1,4 +1,5 @@
 #include "../include/triangular-matrix.hpp"
+#include "../include/vector.hpp"
 #include <stdexcept>
 #include <vector>
 
@@ -60,4 +61,86 @@ double Triangular_Matrix::determinant() const {
     }
 
     return product;
+}
+
+// expects a nonsingular lower triangular matrix, otherwise throw exception
+Vector Triangular_Matrix::forward_substitution(Vector b) const {
+
+    if (!::is_lower_triangular(v)) {
+        throw std::invalid_argument(
+            "class Triangular_Matrix: method forward_substitution: Current "
+            "matrix is not a lower triangular matrix");
+    }
+
+    if (b.get_num_element() != get_num_row()) {
+        throw std::invalid_argument(
+            "class Triangular_Matrix: method forward_substitution: input "
+            "Vector b's size does not match");
+    }
+
+    int n = get_num_row();
+
+    Vector result = Vector::get_zero_vector(n);
+
+    for (size_t i = 0; i < n; i++) {
+
+        if (get_data()[i][i] == 0.0) {
+            throw std::invalid_argument(
+                "class Triangular_Matrix: method forward_substitution: Current "
+                "matrix is singular");
+        }
+
+        double val = b.get_element(i);
+
+        for (size_t j = 0; j < i; j++) {
+            val -= get_data()[i][j] * result.get_element(j);
+        }
+
+        val /= get_data()[i][i];
+
+        result.set_entry(i, 0, val);
+    }
+
+    return result;
+}
+
+// expects a nonsingular upper triangular matrix, otherwise throw exception
+Vector Triangular_Matrix::backward_substitution(Vector b) const {
+
+    if (!::is_upper_triangular(v)) {
+        throw std::invalid_argument(
+            "class Triangular_Matrix: method backward_substitution: Current "
+            "matrix is not a lower triangular matrix");
+    }
+
+    if (b.get_num_element() != get_num_row()) {
+        throw std::invalid_argument(
+            "class Triangular_Matrix: method backward_substitution: input "
+            "Vector b's size does not match");
+    }
+
+    int n = get_num_row();
+
+    Vector result = Vector::get_zero_vector(n);
+
+    for (size_t i = n - 1; i >= 0; i--) {
+
+        if (get_data()[i][i] == 0.0) {
+            throw std::invalid_argument("class Triangular_Matrix: method "
+                                        "backward_substitution: Current "
+                                        "matrix is singular");
+        }
+
+        double val = b.get_element(i);
+
+        for (size_t j = n - 1; j >= i + 1; j--) {
+            val -= get_data()[i][j] * result.get_element(j);
+        }
+
+        val /= get_data()[i][i];
+
+        result.set_entry(i, 0, val);
+    }
+
+    return result;
 }
