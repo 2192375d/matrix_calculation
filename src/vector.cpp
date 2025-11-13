@@ -1,4 +1,4 @@
-#include "../include/vector.hpp"
+#include "vector.hpp"
 #include <stdexcept>
 #include <vector>
 

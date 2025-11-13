@@ -1,5 +1,5 @@
-#include "../include/triangular-matrix.hpp"
-#include "../include/vector.hpp"
+#include "triangular-matrix.hpp"
+#include "vector.hpp"
 #include <stdexcept>
 #include <vector>
 

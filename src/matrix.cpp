@@ -1,6 +1,6 @@
-#include "../include/matrix.hpp"
-#include "../include/helpers.hpp"
-#include "../include/square-matrix.hpp"
+#include "matrix.hpp"
+#include "helpers.hpp"
+#include "square-matrix.hpp"
 
 #include <algorithm>
 #include <iostream>
