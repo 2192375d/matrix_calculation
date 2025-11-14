@@ -1,25 +1,57 @@
-#pragma once
+#include "cli/engine.hpp"
 
-#include "cli/parser.hpp"
-#include "matrix.hpp"
+#include <replxx.hxx>
+#include <tabulate/table.hpp>
 
-#include <string>
-#include <unordered_map>
+#include <iostream>
 
-class Engine {
-  public:
-    Engine();
+constexpr auto DARK_BLUE = "\033[34m";
+constexpr auto LIGHT_BLUE = "\033[94m";
+constexpr auto ORANGE = "\033[38;5;208m";
 
-    // Run the interactive loop (returns when user exits)
-    int run();
+constexpr auto RESET = "\033[0m";
 
-  private:
-    using MatrixStore = std::unordered_map<std::string, Matrix>;
+Engine::Engine() {}
 
-    void execute(const Command &cmd);
-    void handle_meta(const Command &cmd);
-    void handle_operation(const Command &cmd);
+void Engine::run() {
 
-    MatrixStore matrices_;
-    bool running_;
-};
+    replxx::Replxx rx;
+    bool running = true;
+    tabulate::Table t;
+
+    t.format()
+        .corner_color(tabulate::Color::blue)
+        .border_color(tabulate::Color::blue);
+
+    while (running) {
+        t = get_matrix_table();
+
+        std::cout << RESET << "_______________MATRIX CALCULATOR_______________"
+                  << std::endl;
+        std::cout << t;
+
+        const char *input = rx.input(">>> ");
+
+        if (input == NULL) {
+            break;
+        }
+
+        std::string line(input);
+
+        if (line == "exit") {
+            break;
+        }
+    }
+}
+
+tabulate::Table Engine::get_matrix_table() {
+
+    tabulate::Table result;
+    for (auto it = matrices.begin(); it != matrices.end(); it++) {
+        auto &row =
+            result.add_row(tabulate::RowStream{} << it->first << it->second);
+        row.format().font_color(tabulate::Color::cyan);
+    }
+
+    return result;
+}

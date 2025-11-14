@@ -103,8 +103,9 @@ Command parser(std::string message) {
     }
 
     // handle = + - *
-    if (tokens.size() >= 2 && std::find(std::begin(SYMBOLS), std::end(SYMBOLS),
-                                        tokens[1]) != std::end(SYMBOLS)) {
+    if (tokens.size() >= 2 && !tokens[1].empty() &&
+        std::find(std::begin(SYMBOLS), std::end(SYMBOLS), tokens[1][0]) !=
+            std::end(SYMBOLS)) {
         cmd.args.push_back(tokens[0]);
         for (size_t i = 2; i < tokens.size(); i++) {
             cmd.args.push_back(tokens[i]);

@@ -30,7 +30,6 @@ add_library(linalg
 target_include_directories(linalg PUBLIC ${CMAKE_SOURCE_DIR}/include)
 
 add_library(linalg_cli
-  src/cli/commands.cpp
   src/cli/engine.cpp
   src/cli/io.cpp
   src/cli/parser.cpp
@@ -40,5 +39,5 @@ target_include_directories(linalg_cli PUBLIC ${CMAKE_SOURCE_DIR}/include)
 target_link_libraries(linalg_cli PUBLIC linalg replxx tabulate::tabulate)
 
 add_executable(linalg_repl apps/repl/main.cpp)
-target_link_libraries(linalg_repl PRIVATE linalg replxx tabulate::tabulate)
+target_link_libraries(linalg_repl PRIVATE linalg linalg_cli replxx tabulate::tabulate)
 target_include_directories(linalg_repl PRIVATE ${CMAKE_SOURCE_DIR}/include)
