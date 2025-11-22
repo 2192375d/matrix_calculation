@@ -9,10 +9,11 @@
 
 class Engine {
   public:
-    std::map<std::string, Matrix> matrices;
-
     Engine();
-
-    tabulate::Table get_matrix_table();
     void run();
+
+  private:
+    std::map<std::string, Matrix> matrices;
+    tabulate::Table get_matrix_table();
+    void pause_console();
 };

@@ -1,51 +1,45 @@
 #include "cli/engine.hpp"
+#include "cli/parser.hpp"
 
 #include <replxx.hxx>
 #include <tabulate/table.hpp>
 
 #include <iostream>
-
-constexpr auto DARK_BLUE = "\033[34m";
-constexpr auto LIGHT_BLUE = "\033[94m";
-constexpr auto ORANGE = "\033[38;5;208m";
-
-constexpr auto RESET = "\033[0m";
+#include <limits>
+#include <map>
 
 Engine::Engine() {}
 
 void Engine::run() {
 
     replxx::Replxx rx;
-    bool running = true;
     tabulate::Table t;
+    Command cmd;
+    std::string line_input;
 
-    t.format()
-        .corner_color(tabulate::Color::blue)
-        .border_color(tabulate::Color::blue);
+    matrices["A"] = Matrix({{1, 2, 3}, {2, 4, 1}, {-1, 2, 1}});
 
-    while (running) {
+    while (true) {
+        rx.clear_screen();
+
         t = get_matrix_table();
 
-        std::cout << RESET << "_______________MATRIX CALCULATOR_______________"
+        std::cout << "_______________MATRIX CALCULATOR_______________"
                   << std::endl;
-        std::cout << t;
+        std::cout << t << std::endl;
 
-        const char *input = rx.input(">>> ");
-
-        if (input == NULL) {
+        const char *INPUT = rx.input(">>> ");
+        if (INPUT == NULL) {
             break;
         }
+        line_input = INPUT;
+        cmd = parser(line_input);
 
-        std::string line(input);
-
-        if (line == "exit") {
-            break;
-        }
+        // handle command using command.hpp
     }
 }
 
 tabulate::Table Engine::get_matrix_table() {
-
     tabulate::Table result;
     for (auto it = matrices.begin(); it != matrices.end(); it++) {
         auto &row =
@@ -54,4 +48,9 @@ tabulate::Table Engine::get_matrix_table() {
     }
 
     return result;
+}
+
+void Engine::pause_console() {
+    std::cout << "Press enter to continue...";
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
